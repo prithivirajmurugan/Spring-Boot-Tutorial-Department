@@ -19,22 +19,35 @@ class DepartmentServiceTest {
     private DepartmentService departmentService;
     @MockBean
     private DepartmentRepository departmentRepository;
+    private Department department;
     @BeforeEach
     void setUp() {
-        Department department = Department.builder().departmentName("IT")
-                .departmentAddress("IT-06")
+        department = Department.builder().departmentName("IT")
+                .departmentCode("IT-06")
+                .departmentAddress("New Delhi")
                 .departmentId(1L)
                 .build();
-        Mockito.when(departmentRepository.findByDepartmentNameIgnoreCase("IT"))
-                .thenReturn(department);
-
     }
 
     @Test
-    @DisplayName(("Get Data based on Valid Department Name"))
+    @DisplayName("Get Data based on Valid Department Name")
     public void whenValidDepartmentName_thenDepartmentShouldFound(){
+        Mockito.when(departmentRepository.findByDepartmentNameIgnoreCase("IT"))
+                .thenReturn(department);
         String departmentName = "IT";
         Department found = departmentService.fetchDepartmentByName(departmentName);
         assertEquals(departmentName,found.getDepartmentName());
+    }
+    @Test
+    @DisplayName("Save department to the Repository")
+    public void whenSaveDepartment_thenDepartServiceShouldBeCalled(){
+        Department pre_save_department = Department.builder().departmentName("IT")
+                        .departmentCode("IT-06")
+                .departmentAddress("New Delhi")
+                                .build();
+
+        Mockito.when(departmentRepository.save(pre_save_department)).thenReturn(department);
+        departmentService.saveDepartment(department);
+        Mockito.verify(departmentRepository,Mockito.times(1)).save(department);
     }
 }
